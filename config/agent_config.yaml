@@ -1,0 +1,25 @@
+model:
+  name: "llava-hf/llava-1.5-7b-hf"
+  max_tokens: 512
+  temperature: 0.7
+
+memory:
+  short_term_ttl: 3600  # 1 hour
+  long_term_db: "chromadb"
+  embedding_model: "all-MiniLM-L6-v2"
+
+camera:
+  url: "http://192.168.1.100:8080/video"
+  capture_interval: 30  # seconds
+
+training:
+  interval_hours: 24
+  epochs_per_training: 3
+  lora_rank: 16
+  learning_rate: 5e-5
+
+tools:
+  enabled:
+    - web_search
+    - observe_surroundings
+    - memory_query
