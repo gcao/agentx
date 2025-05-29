@@ -1,54 +1,41 @@
-import gradio as gr
-import requests
-import base64
+from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse, JSONResponse
+import httpx
+import asyncio
 
-class ChatInterface:
-    def __init__(self, api_url="http://localhost:8000"):
-        self.api_url = api_url
-        self.conversation_history = []
+app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
+
+@app.get("/", response_class=HTMLResponse)
+async def chat_page(request: Request):
+    return templates.TemplateResponse("chat.html", {"request": request})
+
+@app.post("/chat")
+async def chat_endpoint(request: Request):
+    form_data = await request.form()
+    message = form_data.get("message")
     
-    def chat(self, message, image=None):
-        # Prepare message
-        msg = {"role": "user", "content": message}
-        
-        # Handle image upload
-        if image is not None:
-            with open(image.name, "rb") as f:
-                img_data = base64.b64encode(f.read()).decode()
-                msg["images"] = [f"data:image/jpeg;base64,{img_data}"]
-        
-        self.conversation_history.append(msg)
-        
-        # Send to API
-        response = requests.post(
-            f"{self.api_url}/v1/chat/completions",
-            json={
-                "model": "conscious-agent",
-                "messages": self.conversation_history[-10:],  # Last 10 messages
-                "temperature": 0.7
-            }
-        )
-        
-        if response.status_code == 200:
-            result = response.json()
-            assistant_msg = result["choices"][0]["message"]["content"]
-            self.conversation_history.append({
-                "role": "assistant",
-                "content": assistant_msg
-            })
-            return assistant_msg
-        else:
-            return "Error: Could not get response"
-    
-    def launch(self):
-        interface = gr.Interface(
-            fn=self.chat,
-            inputs=[
-                gr.Textbox(placeholder="Enter your message..."),
-                gr.File(label="Upload Image (optional)")
-            ],
-            outputs=gr.Textbox(),
-            title="Conscious AI Agent",
-            description="Chat with your AI agent that can see and learn"
-        )
-        interface.launch()
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.post(
+                "http://localhost:8000/api/chat",
+                json={"message": message},
+                timeout=30.0
+            )
+            response.raise_for_status()
+            return HTMLResponse(
+                f'<div class="user-message">{message}</div>'
+                f'<div class="bot-message">{response.json()["response"]}</div>'
+            )
+        except Exception as e:
+            return JSONResponse(
+                {"error": str(e)},
+                status_code=500
+            )
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=5000)
