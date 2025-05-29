@@ -20,7 +20,7 @@ async def main():
         # Initialize components
         model = MultiModalModel()
         memory_manager = MemoryManager()
-        camera_observer = CameraObserver(config["camera"]["url"])
+        camera_observer = CameraObserver(config["camera"]["device"], model, memory_manager)
         training_scheduler = TrainingScheduler(model, interval_hours=24)
         
         # Start services

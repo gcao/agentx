@@ -10,7 +10,7 @@ memory:
   embedding_model: "all-MiniLM-L6-v2"
 
 camera:
-  url: "http://192.168.1.100:8080/video"
+  device: 0  # Use built-in webcam
   capture_interval: 30  # seconds
 
 training:

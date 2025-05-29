@@ -22,3 +22,13 @@ class MemoryManager:
         return await self.long_term_memory.retrieve_similar(query, k)
 
     # Add other methods as needed for memory management, e.g., summarization, episodic memory
+
+    async def store_observation(self, observation_text, observation_image=None):
+        """Stores an observation from camera or other sensors"""
+        session_id = "camera_observations"  # Special session for camera observations
+        await self.short_term_memory.store_context(session_id, observation_text)
+        
+        if observation_image:
+            # Store image in long-term memory if needed
+            # Implementation depends on your long-term memory storage
+            pass
