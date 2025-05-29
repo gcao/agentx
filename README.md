@@ -28,28 +28,28 @@ An experimental AI system designed to develop consciousness-like behaviors throu
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                      User Interface                          │
+│                      User Interface                         │
 │                  (Gradio/Streamlit/React)                   │
 └───────────────────────┬─────────────────────────────────────┘
                         │
 ┌───────────────────────┴─────────────────────────────────────┐
-│                   API Gateway (FastAPI)                      │
-│              (OpenAI-Compatible Endpoints)                   │
+│                   API Gateway (FastAPI)                     │
+│              (OpenAI-Compatible Endpoints)                  │
 └───────────────────────┬─────────────────────────────────────┘
                         │
-        ┌───────────────┼───────────────┬──────────────┐
-        │               │               │              │
-┌───────▼──────┐ ┌─────▼──────┐ ┌─────▼──────┐ ┌────▼─────┐
+        ┌───────────────┼──────────────┬─────────────┐
+        │               │              │             │
+┌───────▼──────┐ ┌──────▼──────┐ ┌─────▼──────┐ ┌────▼─────┐
 │  Multi-Modal │ │   Memory    │ │    Tool    │ │ Training │
 │     LLM      │ │  Systems    │ │  Manager   │ │ Pipeline │
 │  (LLaVA/     │ │ (Short/Long │ │   (MCP)    │ │  (LoRA)  │
 │   Qwen-VL)   │ │   Term)     │ │            │ │          │
-└──────────────┘ └─────┬──────┘ └────────────┘ └──────────┘
-                       │
-              ┌────────┴────────┐
-              │ Vector Database │
-              │   (ChromaDB)    │
-              └─────────────────┘
+└──────────────┘ └──────┬──────┘ └────────────┘ └──────────┘
+                        │
+               ┌────────┴────────┐
+               │ Vector Database │
+               │   (ChromaDB)    │
+               └─────────────────┘
 ```
 
 ### Component Breakdown

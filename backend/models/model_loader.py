@@ -1,16 +1,18 @@
 import torch
-from transformers import LlavaForConditionalGeneration, AutoProcessor
+from transformers import AutoModelForCausalLM, AutoProcessor, BitsAndBytesConfig
 
 class MultiModalModel:
-    def __init__(self, model_name="llava-hf/llava-1.5-7b-hf"):
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.model = LlavaForConditionalGeneration.from_pretrained(
+    def __init__(self, model_name="models/qwen-vl-chat-7b"):
+        self.device = torch.device("cpu")  # Force CPU usage
+        
+        self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
-            torch_dtype=torch.float16,
-            device_map="auto",
-            load_in_8bit=True  # For memory efficiency
+            torch_dtype=torch.float32,
+            device_map="cpu",
+            trust_remote_code=True,
+            low_cpu_mem_usage=True
         )
-        self.processor = AutoProcessor.from_pretrained(model_name)
+        self.processor = AutoProcessor.from_pretrained(model_name, trust_remote_code=True)
     
     def generate(self, text, image=None, max_tokens=256):
         if image:

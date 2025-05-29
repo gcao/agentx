@@ -1,5 +1,6 @@
 model:
-  name: "llava-hf/llava-1.5-7b-hf"
+  # name: "llava-hf/llava-1.5-7b-hf"
+  name: "qwen-vl-chat-7b"
   max_tokens: 512
   temperature: 0.7
 
