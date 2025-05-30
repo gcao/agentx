@@ -7,7 +7,7 @@ import asyncio
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="frontend/templates")
 
 @app.get("/", response_class=HTMLResponse)
 async def chat_page(request: Request):
@@ -15,8 +15,8 @@ async def chat_page(request: Request):
 
 @app.post("/chat")
 async def chat_endpoint(request: Request):
-    form_data = await request.form()
-    message = form_data.get("message")
+    data = await request.json()
+    message = data.get("message")
     
     async with httpx.AsyncClient() as client:
         try:
@@ -30,9 +30,19 @@ async def chat_endpoint(request: Request):
                 f'<div class="user-message">{message}</div>'
                 f'<div class="bot-message">{response.json()["response"]}</div>'
             )
+        except httpx.HTTPStatusError as e:
+            return JSONResponse(
+                {"error": f"Backend returned {e.response.status_code}: {e.response.text}"},
+                status_code=502
+            )
+        except httpx.RequestError as e:
+            return JSONResponse(
+                {"error": f"Connection error: {str(e)}"},
+                status_code=503
+            )
         except Exception as e:
             return JSONResponse(
-                {"error": str(e)},
+                {"error": f"Unexpected error: {str(e)}"},
                 status_code=500
             )
 

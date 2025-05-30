@@ -45,15 +45,39 @@
         <div id="messages" hx-swap-oob="beforeend">
             <!-- Messages will appear here -->
         </div>
-        <form id="message-form" hx-post="/chat" hx-target="#messages" hx-swap="beforeend">
+        <form id="message-form">
             <input type="text" id="message-input" name="message" placeholder="Type your message..." required>
             <button type="submit">Send</button>
         </form>
     </div>
 
     <script>
-        document.getElementById('message-form').addEventListener('htmx:afterRequest', function() {
-            document.getElementById('message-input').value = '';
+        document.getElementById('message-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const message = document.getElementById('message-input').value;
+            const messagesDiv = document.getElementById('messages');
+            
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({message: message})
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const html = await response.text();
+                messagesDiv.insertAdjacentHTML('beforeend', html);
+                document.getElementById('message-input').value = '';
+            } catch (error) {
+                console.error('Error:', error);
+                messagesDiv.insertAdjacentHTML('beforeend', 
+                    `<div class="error-message">Error sending message: ${error.message}</div>`);
+            }
         });
     </script>
 </body>
